@@ -1,12 +1,20 @@
-const { callGemini } = require('./modules/api.js');
-const { getCurrentImage } = require('./modules/imaging.js');
-const { getMockResponse } = require('./modules/mock.js');
+let callGemini, getCurrentImage, getMockResponse, addMessageToUI;
+
+try {
+    ({ callGemini } = require('./src/services/api.js'));
+    ({ getCurrentImage } = require('./src/services/imaging.js'));
+    ({ getMockResponse } = require('./src/services/mock.js'));
+    ({ addMessageToUI } = require('./src/ui/chat.js'));
+} catch (e) {
+    console.error('Failed to load modules:', e);
+}
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Gemini Critique Plugin Loaded");
+    console.log('Gemini Critique Plugin Loaded');
 
     // --- UI ELEMENTS ---
     const apiKeyInput = document.getElementById('api-key');
+
     const modelSelect = document.getElementById('model-select');
     const saveSettingsBtn = document.getElementById('save-settings');
     const scanBtn = document.getElementById('scan-critique-btn');
@@ -32,46 +40,9 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSettingsBtn.addEventListener('click', () => {
             localStorage.setItem('gemini_api_key', apiKeyInput.value);
             localStorage.setItem('gemini_model', modelSelect.value);
-            saveSettingsBtn.textContent = "Saved!";
-            setTimeout(() => saveSettingsBtn.textContent = "Save Settings", 2000);
+            saveSettingsBtn.textContent = 'Saved!';
+            setTimeout(() => saveSettingsBtn.textContent = 'Save Settings', 2000);
         });
-    }
-
-    // --- HELPER: MARKDOWN PARSER ---
-    function parseMarkdown(text) {
-        if (!text) return "";
-        // Headers
-        let html = text
-            .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-            .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-            .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Bold
-            .replace(/\*(.*?)\*/g, '<em>$1</em>'); // Italic
-
-        // Paragraphs (Split by newline and wrap)
-        return html.split('\n').map(line => {
-            line = line.trim();
-            if (line === '') return '';
-            if (line.startsWith('- ') || line.startsWith('* ')) {
-                return `<ul><li>${line.substring(2)}</li></ul>`;
-            }
-            return `<p>${line}</p>`;
-        }).join('');
-    }
-
-    // --- HELPER: SCROLL TO BOTTOM ---
-    function scrollToBottom() {
-        // Timeout is required in UXP to allow layout to refresh first
-        setTimeout(() => {
-            chatHistoryDiv.scrollTop = chatHistoryDiv.scrollHeight;
-        }, 100);
-    }
-
-    function addMessageToUI(role, text) {
-        const msgDiv = document.createElement('div');
-        msgDiv.classList.add('message', role);
-        msgDiv.innerHTML = parseMarkdown(text);
-        chatHistoryDiv.appendChild(msgDiv);
-        scrollToBottom();
     }
 
     // --- MAIN ACTION: SCAN ---
@@ -98,18 +69,18 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.description').classList.add('hidden');
 
             try {
-                console.log("Getting image...");
+                console.log('Getting image...');
                 const imageBase64 = await getCurrentImage();
                 const userPrompt = promptInput.value;
 
                 // Add user message to UI
-                addMessageToUI('user', userPrompt);
+                addMessageToUI(chatHistoryDiv, 'user', userPrompt);
 
                 // Prepare API Payload
-                let mimeType = "image/jpeg";
-                if (imageBase64.includes("image/png")) mimeType = "image/png";
+                let mimeType = 'image/jpeg';
+                if (imageBase64.includes('image/png')) mimeType = 'image/png';
 
-                const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+                const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
                 const userMessage = {
                     role: 'user',
@@ -123,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Call API or Mock
                 let responseText;
                 if (model === 'mock-model') {
-                    console.log("Using Mock Model...");
+                    console.log('Using Mock Model...');
                     responseText = await getMockResponse();
                 } else {
                     console.log(`Calling Gemini API (${model})...`);
@@ -132,7 +103,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
                 // Handle Response
                 chatHistory.push({ role: 'model', parts: [{ text: responseText }] });
-                addMessageToUI('model', responseText);
+                addMessageToUI(chatHistoryDiv, 'model', responseText);
 
                 // Enable Reply
                 chatInput.disabled = false;
@@ -141,7 +112,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             } catch (error) {
                 console.error(error);
-                addMessageToUI('model', `Error: ${error.message}`);
+                addMessageToUI(chatHistoryDiv, 'model', `Error: ${error.message}`);
                 // Show controls again on error so user can retry
                 document.querySelector('.prompt-section').classList.remove('hidden');
                 scanBtn.classList.remove('hidden');
@@ -166,15 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Capture Image for every reply
-            console.log("Capturing updated image for reply...");
+            console.log('Capturing updated image for reply...');
             const imageBase64 = await getCurrentImage();
 
-            let mimeType = "image/jpeg";
-            if (imageBase64.includes("image/png")) mimeType = "image/png";
-            const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+            let mimeType = 'image/jpeg';
+            if (imageBase64.includes('image/png')) mimeType = 'image/png';
+            const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
             // Add to UI
-            addMessageToUI('user', text + " <br><small><i>(Sent with updated image)</i></small>");
+            addMessageToUI(chatHistoryDiv, 'user', text + ' <br><small><i>(Sent with updated image)</i></small>');
 
             // Add to History with Image
             chatHistory.push({
@@ -187,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let responseText;
             if (model === 'mock-model') {
-                console.log("Using Mock Model (Reply)...");
+                console.log('Using Mock Model (Reply)...');
                 responseText = await getMockResponse();
             } else {
                 console.log(`Calling Gemini API (${model})...`);
@@ -195,10 +166,10 @@ document.addEventListener('DOMContentLoaded', () => {
             }
 
             chatHistory.push({ role: 'model', parts: [{ text: responseText }] });
-            addMessageToUI('model', responseText);
+            addMessageToUI(chatHistoryDiv, 'model', responseText);
         } catch (error) {
             console.error(error);
-            addMessageToUI('model', `Error: ${error.message}`);
+            addMessageToUI(chatHistoryDiv, 'model', `Error: ${error.message}`);
         } finally {
             chatInput.disabled = false;
             loadingIndicator.classList.add('hidden');
