@@ -10,7 +10,16 @@
     },
     "rules": {
         "no-unused-vars": "warn",
-        "no-undef": "warn"
+        "no-undef": "warn",
+        "no-console": "off",
+        "semi": [
+            "error",
+            "always"
+        ],
+        "quotes": [
+            "error",
+            "single"
+        ]
     },
     "globals": {
         "sp-progress-circle": "readonly"
