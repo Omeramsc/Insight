@@ -1,0 +1,85 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <title>Gemini Critique</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+
+<body>
+    <div class="container">
+        <!-- Settings Section -->
+        <div class="section" id="settings-section">
+            <div class="row">
+                <label for="api-key">Gemini API Key</label>
+                <input type="password" id="api-key" placeholder="Enter API Key">
+            </div>
+            <div class="row">
+                <label for="model-select">Model</label>
+                <select id="model-select">
+                    <option value="gemini-3-flash">Gemini 3 Flash (Newest)</option>
+                    <option value="gemini-2.5-flash">Gemini 2.5 Flash</option>
+                    <option value="gemini-2.5-flash-lite">Gemini 2.5 Flash Lite (Fast)</option>
+                    <option value="gemini-2.0-flash">Gemini 2.0 Flash (Stable)</option>
+                    <option value="mock-model">🛠️ Mock Model (Debug)</option>
+                </select>
+            </div>
+            <button id="save-settings">Save Settings</button>
+        </div>
+
+        <hr>
+
+        <!-- Mode Selection (Placeholder for future expansion) -->
+        <div class="tabs">
+            <button class="tab active" data-tab="critique">Critique</button>
+            <!-- <button class="tab" data-tab="qa">Q&A</button> -->
+        </div>
+
+        <!-- Critique View -->
+        <div id="critique-view" class="view active">
+            <div class="description">
+                <p>Get the brutal truth about your photo from Gemini.</p>
+            </div>
+
+            <div class="prompt-section">
+                <label for="prompt-input">Prompt</label>
+                <textarea id="prompt-input"
+                    rows="4">I want you to act as a professional photography critic and editor. I am going to send you my cosplay/concert photography, and I want you to give me the brutal truth. Do not sugarcoat it. Focus on:
+
+Integration & Realism: Does the subject look 'pasted' or 'flat'? Do digital assets like fog or ice look like clip art or physical parts of the room?
+
+Lighting Physics: Does the lighting on the subject match the environment? Are there missing 'light wraps' or rim lights from background elements?
+
+Color Theory: Is the palette cohesive or is it 'messy noise'? Are the colors fighting for attention?
+
+Composition & Narrative: Does the pose and angle tell a story, and does the editing support or distract from that story?
+
+Break down exactly why the illusion is breaking and give me a specific action plan (what to darken, lighten, or tint) to make it perfect.</textarea>
+            </div>
+
+            <button id="scan-critique-btn" class="action-btn">Scan & Start Chat</button>
+
+            <div id="loading" class="hidden">
+                <sp-progress-circle indeterminate></sp-progress-circle>
+                <span>Analyzing...</span>
+            </div>
+
+            <div id="chat-container" class="chat-container hidden">
+                <div id="chat-history" class="chat-history">
+                    <!-- Chat messages will appear here -->
+                </div>
+                <div class="chat-input-area">
+                    <button id="new-scan-btn" title="Start New Scan"
+                        style="background-color: #4b4b4b;">&#x21bb;</button>
+                    <input type="text" id="chat-input" placeholder="Ask a follow-up question..." disabled>
+                    <button id="send-reply-btn" disabled>Send</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="index.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,62 @@
+{
+    "id": "com.gemini.photoshop.plugin",
+    "name": "Gemini Critique",
+    "version": "1.0.0",
+    "main": "index.html",
+    "manifestVersion": 5,
+    "host": [
+        {
+            "app": "PS",
+            "minVersion": "24.0.0",
+            "data": {
+                "apiVersion": 2
+            }
+        }
+    ],
+    "entrypoints": [
+        {
+            "type": "panel",
+            "id": "geminiPanel",
+            "label": "Gemini Critique",
+            "minimumSize": {
+                "width": 300,
+                "height": 300
+            },
+            "maximumSize": {
+                "width": 800,
+                "height": 800
+            },
+            "preferredDockedSize": {
+                "width": 300,
+                "height": 600
+            },
+            "preferredFloatingSize": {
+                "width": 300,
+                "height": 600
+            },
+            "icons": [
+                {
+                    "width": 23,
+                    "height": 23,
+                    "path": "icons/icon.png"
+                }
+            ]
+        }
+    ],
+    "requiredPermissions": {
+        "network": {
+            "domains": [
+                "all",
+                "https://generativelanguage.googleapis.com"
+            ]
+        },
+        "localFileSystem": "request"
+    },
+    "icons": [
+        {
+            "width": 23,
+            "height": 23,
+            "path": "icons/icon.png"
+        }
+    ]
+}
