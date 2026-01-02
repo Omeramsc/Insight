@@ -46,7 +46,6 @@
     "requiredPermissions": {
         "network": {
             "domains": [
-                "all",
                 "https://generativelanguage.googleapis.com"
             ]
         },
