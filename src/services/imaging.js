@@ -1,13 +1,16 @@
-const { app, core } = require('photoshop');
-const fs = require('uxp').storage.localFileSystem;
-const formats = require('uxp').storage.formats;
+
+
 
 /**
  * Captures the current active document as a base64 string.
  * Resizes the image if it exceeds the maxSize (long edge).
  * @param {number} maxSize - Maximum pixel length for the long edge (default 3000).
  */
-async function getCurrentImage(maxSize = 3000) {
+async function getCurrentImage(maxSize = 3000, { photoshop = require('photoshop'), uxp = require('uxp') } = {}) {
+    const { app, core } = photoshop;
+    const fs = uxp.storage.localFileSystem;
+    const formats = uxp.storage.formats;
+
     return await core.executeAsModal(async () => {
         let docToSave = null;
         let tempDocCreated = false;
@@ -15,7 +18,7 @@ async function getCurrentImage(maxSize = 3000) {
         try {
             const appDoc = app.activeDocument;
             if (!appDoc) {
-                throw new Error("No active document found. Please open an image.");
+                throw new Error('No active document found. Please open an image.');
             }
 
             // Check dimensions
@@ -28,11 +31,11 @@ async function getCurrentImage(maxSize = 3000) {
                 console.log(`Image is too large (${longEdge}px). Resizing to ${maxSize}px...`);
                 // Duplicate the document to avoid modifying the original
                 try {
-                    docToSave = await appDoc.duplicate("gemini_temp_resize");
+                    docToSave = await appDoc.duplicate('gemini_temp_resize');
                     tempDocCreated = true;
-                    console.log("Document duplicated.");
+                    console.log('Document duplicated.');
                 } catch (dupErr) {
-                    console.error("Duplicate failed:", dupErr);
+                    console.error('Duplicate failed:', dupErr);
                     // Fallback: use original if duplicate fails (risky but better than crash)
                     docToSave = appDoc;
                 }
@@ -46,26 +49,26 @@ async function getCurrentImage(maxSize = 3000) {
 
                     // Resize the duplicate
                     await docToSave.resizeImage(newWidth, newHeight);
-                    console.log("Resize complete.");
+                    console.log('Resize complete.');
                 }
             } else {
                 docToSave = appDoc;
             }
 
             // 1. Create a temporary file
-            console.log("Creating temp file...");
+            console.log('Creating temp file...');
             const tempFolder = await fs.getTemporaryFolder();
-            const tempFile = await tempFolder.createFile("gemini_temp_scan.jpg", { overwrite: true });
+            const tempFile = await tempFolder.createFile('gemini_temp_scan.jpg', { overwrite: true });
 
             // 2. Save the document to the temporary file
-            console.log("Saving to temp file...");
+            console.log('Saving to temp file...');
             await docToSave.saveAs.jpg(tempFile, { quality: 8 }, true);
-            console.log("Save complete.");
+            console.log('Save complete.');
 
             // 3. Read the file as binary
-            console.log("Reading file...");
+            console.log('Reading file...');
             const data = await tempFile.read({ format: formats.binary });
-            console.log("Read complete.");
+            console.log('Read complete.');
 
             // 4. Convert binary data to base64 string
             const base64String = base64ArrayBuffer(data);
@@ -77,7 +80,7 @@ async function getCurrentImage(maxSize = 3000) {
             return `data:image/jpeg;base64,${base64String}`;
 
         } catch (e) {
-            console.error("Error in getCurrentImage:", e);
+            console.error('Error in getCurrentImage:', e);
             throw e;
         } finally {
             // Close the temporary duplicate if we created one
@@ -85,11 +88,11 @@ async function getCurrentImage(maxSize = 3000) {
                 try {
                     await docToSave.closeWithoutSaving();
                 } catch (closeErr) {
-                    console.error("Error closing temp document:", closeErr);
+                    console.error('Error closing temp document:', closeErr);
                 }
             }
         }
-    }, { commandName: "Scanning Image for Gemini" });
+    }, { commandName: 'Scanning Image for Gemini' });
 }
 
 // Helper function to convert ArrayBuffer to Base64

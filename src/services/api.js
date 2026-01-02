@@ -5,7 +5,7 @@
  * @param {string} model - The model to use (e.g., 'gemini-2.5-flash').
  * @returns {Promise<string>} - The generated text response.
  */
-async function callGemini(contents, apiKey, model = 'gemini-2.5-flash') {
+async function callGemini(contents, apiKey, model = 'gemini-2.5-flash', { fetchImpl = fetch } = {}) {
     const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${apiKey}`;
 
     const payload = {
@@ -13,7 +13,7 @@ async function callGemini(contents, apiKey, model = 'gemini-2.5-flash') {
     };
 
     try {
-        const response = await fetch(url, {
+        const response = await fetchImpl(url, {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json'
@@ -32,11 +32,11 @@ async function callGemini(contents, apiKey, model = 'gemini-2.5-flash') {
         if (data.candidates && data.candidates.length > 0 && data.candidates[0].content && data.candidates[0].content.parts) {
             return data.candidates[0].content.parts.map(part => part.text).join('');
         } else {
-            return "No response generated.";
+            return 'No response generated.';
         }
 
     } catch (error) {
-        console.error("API Call Failed:", error);
+        console.error('API Call Failed:', error);
         throw error;
     }
 }

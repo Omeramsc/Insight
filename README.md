@@ -31,6 +31,16 @@ A Photoshop UXP plugin that integrates with Google's Gemini API to provide profe
 - **Linting**: Run `npx eslint .` to check for code quality issues.
 - **Formatting**: Run `npx prettier --write .` to format code.
 
+## Troubleshooting
+
+### "File ... npm.ps1 cannot be loaded"
+If you see a PowerShell error about execution policies when running `npm`:
+1.  Run the command using `cmd`: `cmd /c npm test`
+2.  Or change your execution policy (allows local scripts):
+    ```powershell
+    Set-ExecutionPolicy RemoteSigned -Scope CurrentUser
+    ```
+
 ## Requirements
 
 - Adobe Photoshop 2024 (v25.0) or later.

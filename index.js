@@ -6,11 +6,11 @@ try {
     ({ getMockResponse } = require('./src/services/mock.js'));
     ({ addMessageToUI } = require('./src/ui/chat.js'));
 } catch (e) {
-    console.error("Failed to load modules:", e);
+    console.error('Failed to load modules:', e);
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    console.log("Gemini Critique Plugin Loaded");
+    console.log('Gemini Critique Plugin Loaded');
 
     // --- UI ELEMENTS ---
     const apiKeyInput = document.getElementById('api-key');
@@ -40,8 +40,8 @@ document.addEventListener('DOMContentLoaded', () => {
         saveSettingsBtn.addEventListener('click', () => {
             localStorage.setItem('gemini_api_key', apiKeyInput.value);
             localStorage.setItem('gemini_model', modelSelect.value);
-            saveSettingsBtn.textContent = "Saved!";
-            setTimeout(() => saveSettingsBtn.textContent = "Save Settings", 2000);
+            saveSettingsBtn.textContent = 'Saved!';
+            setTimeout(() => saveSettingsBtn.textContent = 'Save Settings', 2000);
         });
     }
 
@@ -69,7 +69,7 @@ document.addEventListener('DOMContentLoaded', () => {
             document.querySelector('.description').classList.add('hidden');
 
             try {
-                console.log("Getting image...");
+                console.log('Getting image...');
                 const imageBase64 = await getCurrentImage();
                 const userPrompt = promptInput.value;
 
@@ -77,10 +77,10 @@ document.addEventListener('DOMContentLoaded', () => {
                 addMessageToUI(chatHistoryDiv, 'user', userPrompt);
 
                 // Prepare API Payload
-                let mimeType = "image/jpeg";
-                if (imageBase64.includes("image/png")) mimeType = "image/png";
+                let mimeType = 'image/jpeg';
+                if (imageBase64.includes('image/png')) mimeType = 'image/png';
 
-                const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+                const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
                 const userMessage = {
                     role: 'user',
@@ -94,7 +94,7 @@ document.addEventListener('DOMContentLoaded', () => {
                 // Call API or Mock
                 let responseText;
                 if (model === 'mock-model') {
-                    console.log("Using Mock Model...");
+                    console.log('Using Mock Model...');
                     responseText = await getMockResponse();
                 } else {
                     console.log(`Calling Gemini API (${model})...`);
@@ -137,15 +137,15 @@ document.addEventListener('DOMContentLoaded', () => {
 
         try {
             // Capture Image for every reply
-            console.log("Capturing updated image for reply...");
+            console.log('Capturing updated image for reply...');
             const imageBase64 = await getCurrentImage();
 
-            let mimeType = "image/jpeg";
-            if (imageBase64.includes("image/png")) mimeType = "image/png";
-            const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, "");
+            let mimeType = 'image/jpeg';
+            if (imageBase64.includes('image/png')) mimeType = 'image/png';
+            const base64Data = imageBase64.replace(/^data:image\/\w+;base64,/, '');
 
             // Add to UI
-            addMessageToUI(chatHistoryDiv, 'user', text + " <br><small><i>(Sent with updated image)</i></small>");
+            addMessageToUI(chatHistoryDiv, 'user', text + ' <br><small><i>(Sent with updated image)</i></small>');
 
             // Add to History with Image
             chatHistory.push({
@@ -158,7 +158,7 @@ document.addEventListener('DOMContentLoaded', () => {
 
             let responseText;
             if (model === 'mock-model') {
-                console.log("Using Mock Model (Reply)...");
+                console.log('Using Mock Model (Reply)...');
                 responseText = await getMockResponse();
             } else {
                 console.log(`Calling Gemini API (${model})...`);

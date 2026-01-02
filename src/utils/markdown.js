@@ -4,7 +4,7 @@
  * @returns {string} The HTML string.
  */
 function parseMarkdown(text) {
-    if (!text) return "";
+    if (!text) return '';
     // Headers
     let html = text
         .replace(/^### (.*$)/gim, '<h3>$1</h3>')
@@ -19,6 +19,7 @@ function parseMarkdown(text) {
         if (line.startsWith('- ') || line.startsWith('* ')) {
             return `<ul><li>${line.substring(2)}</li></ul>`;
         }
+        if (line.startsWith('<h')) return line;
         return `<p>${line}</p>`;
     }).join('');
 }
